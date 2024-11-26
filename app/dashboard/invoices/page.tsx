@@ -5,17 +5,15 @@ import { CreateInvoice } from '@/app/ui/invoices/buttons';
 import { lusitana } from '@/app/ui/fonts';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
-import { fetchInvoicesPages } from '@/app/lib/data'; 
+import { fetchInvoicesPages } from '@/app/lib/data';
 
-export default async function Page(props:{
-  serachParams?: Promise<{
-    query?: string;
-    page?: string;
-  }>
-}) {
-  const searchParams= await props.serachParams;
-  const query= searchParams?.query || '';
-  const currentPage= Number(searchParams?.page) || 1;
+export default async function Page({ searchParams }: { searchParams?: Promise<{ query?: string; page?: string }> }) {
+  // Await the searchParams promise to extract query and page
+  const params = await searchParams;
+  const query = params?.query || '';
+  const currentPage = Number(params?.page) || 1;
+
+  // Await the result of fetchInvoicesPages
   const totalPages = await fetchInvoicesPages(query);
 
   return (
@@ -29,8 +27,9 @@ export default async function Page(props:{
       </div>
       <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />
-      </Suspense> 
+      </Suspense>
       <div className="mt-5 flex w-full justify-center">
+        {/* Pass resolved number to Pagination */}
         <Pagination totalPages={totalPages} />
       </div>
     </div>
